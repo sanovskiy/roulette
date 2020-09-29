@@ -1,0 +1,45 @@
+{% extends "base.html.twig" %}
+
+
+{% block body %}
+    <div id="app">
+        <h1>текущий раунд № ${ round.id }</h1>
+        <p v-if="rotateResult!==0">Выпало значение: ${ rotateResult }</p>
+        <button v-on:click="rotate">rotate!</button>
+        <br><br>
+
+        <div v-if="resultResponse">
+            <h2>ответ:</h2>
+            <textarea aria-multiline="true">${ resultResponse }</textarea>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                round: {
+                    id: {{ round.id }}
+                },
+                rotateResult: 0,
+                resultResponse: null
+            },
+            delimiters: ['${', '}'],
+            methods: {
+                rotate: function (event) {
+                    axios
+                        .post('/roulette/rotate')
+                        .then(response => {
+                            this.resultResponse = response.data;
+                            this.round = this.resultResponse.round;
+                            this.rotateResult = this.resultResponse.result;
+                        });
+                }
+            }
+        })
+    </script>
+
+{% endblock %}
